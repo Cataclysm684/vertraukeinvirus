@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Meme Generator – Vertrau kein Virus</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    canvas {
+      border: 2px solid #fff;
+      margin-top: 20px;
+    }
+    input, button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    label {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Meme Generator</h1>
+
+  <label for="imageUpload">Bild hochladen:</label>
+  <input type="file" id="imageUpload" accept="image/*"><br>
+
+  <label>Text oben:</label>
+  <input type="text" id="topText" placeholder="Z. B. Vertrau kein Virus"><br>
+
+  <label>Text unten:</label>
+  <input type="text" id="bottomText" placeholder="Z. B. Das System lügt"><br>
+
+  <button onclick="generateMeme()">Meme erstellen</button>
+  <button onclick="downloadMeme()">Herunterladen</button>
+
+  <canvas id="memeCanvas" width="500" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById('memeCanvas');
+    const ctx = canvas.getContext('2d');
+    const defaultImage = new Image();
+    defaultImage.crossOrigin = "anonymous";
+    defaultImage.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Skull_and_crossbones.svg/2048px-Skull_and_crossbones.svg.png";
+
+    let image = defaultImage;
+
+    defaultImage.onload = () => drawMeme();
+
+    document.getElementById('imageUpload').addEventListener('change', function(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        image = new Image();
+        image.onload = () => drawMeme();
+        image.src = e.target.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    });
+
+    function drawMeme() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      const topText = document.getElementById('topText').value.toUpperCase();
+      const bottomText = document.getElementById('bottomText').value.toUpperCase();
+
+      ctx.font = 'bold 30px Impact';
+      ctx.textAlign = 'center';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 4;
+      ctx.fillStyle = 'white';
+
+      // Top
+      ctx.strokeText(topText, canvas.width / 2, 40);
+      ctx.fillText(topText, canvas.width / 2, 40);
+
+      // Bottom
+      ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
+      ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
+    }
+
+    function generateMeme() {
+      drawMeme();
+    }
+
+    function downloadMeme() {
+      const link = document.createElement('a');
+      link.download = 'meme.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
+</body>
+</html>
